@@ -5,13 +5,10 @@ const Playlist = db.define(
   'playlist', 
   {
     name: {
-      type: Sequelize.STRING,
-      field: 'playlist_name',
+      type: Sequelize.STRING
     }
   },
-  { tableName: 'spotify_playlists',
-    timestamps: false
-  },
+  { timestamps: false },
 )
 
 module.exports = Playlist
