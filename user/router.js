@@ -18,14 +18,14 @@ router.post(
     res.status(400).send({
       message: 'Passwords do not match'
     })
-} else {
-  User
-    .create(user)
-    .then(() => res
-      .status(201)
-      .json({message: 'You have succesfully created an account!'}))
-    .catch(err => next(err))
-  }
+  } else {
+    User
+      .create(user)
+      .then(() => res
+        .status(201)
+        .json({message: 'You have succesfully created an account!'}))
+      .catch(err => next(err))
+    }
 })
 
 module.exports = router

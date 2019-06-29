@@ -6,6 +6,7 @@ const router = new Router()
 
 router.post(
   '/playlists',
+  auth,
   (req, res, next) => Playlist
     .create(req.body)
     .then(playlist => res
@@ -16,6 +17,7 @@ router.post(
 
 router.get(
   '/playlists',
+  auth,
   (req, res, next) => Playlist
     .findAll()
     .then(playlists => res.json({Playlists: playlists}))
@@ -24,19 +26,27 @@ router.get(
 
 router.get(
   '/playlists/:id',
+  auth,
   (req, res, next) => {
 
   const id = req.params.id
 
   Playlist
     .findByPk(id)
-    .then(playlist => res.json({Playlist: playlist}))
+    .then(playlist => {
+      if (playlist) {
+        res.json({Playlist: playlist})
+      } else {
+        res.status(404).json({message: 'Playlist not found'})
+      }
+    })
     .catch(error => next(error))
   }
 )
 
 router.delete(
   '/playlists/:id',
+  auth,
   (req, res, next) => {
 
   const id = req.params.id
