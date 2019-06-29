@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const Playlist = require('./model')
+const auth = require('../auth/middleware')
 
 const router = new Router()
 
@@ -14,7 +15,7 @@ router.post(
 )
 
 router.get(
-  '/playlists', 
+  '/playlists',
   (req, res, next) => Playlist
     .findAll()
     .then(playlists => res.json({Playlists: playlists}))
@@ -24,7 +25,9 @@ router.get(
 router.get(
   '/playlists/:id',
   (req, res, next) => {
+
   const id = req.params.id
+
   Playlist
     .findByPk(id)
     .then(playlist => res.json({Playlist: playlist}))
@@ -35,7 +38,9 @@ router.get(
 router.delete(
   '/playlists/:id',
   (req, res, next) => {
+
   const id = req.params.id
+
   Playlist
     .findByPk(id)
     .then(playlist => playlist.destroy({playlist}) )
