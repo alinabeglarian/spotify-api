@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
 const db = require('../db')
 const User = require('../user/model')
+const Song = require('../song/model')
 
 const Playlist = db.define(
   'playlist', 
@@ -17,5 +18,6 @@ const Playlist = db.define(
 )
 
 Playlist.belongsTo(User)
+Playlist.hasMany(Song)
 
 module.exports = Playlist

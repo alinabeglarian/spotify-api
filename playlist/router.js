@@ -1,27 +1,45 @@
 const { Router } = require('express')
 const Playlist = require('./model')
 const auth = require('../auth/middleware')
+const Song = require('../song/model')
 
 const router = new Router()
 
 router.post(
   '/playlists',
   auth,
-  (req, res, next) => Playlist
-    .create(req.body)
+  (req, res, next) => {
+
+    const playlist = {
+      name: req.body.name,
+      userId: req.user.id
+    }
+    
+    Playlist
+    .create(playlist)
     .then(playlist => res
       .status(201)
       .json({New_Playlist: playlist}))
     .catch(error => next(error))
+  }
 )
 
 router.get(
   '/playlists',
   auth,
-  (req, res, next) => Playlist
-    .findAll()
+  (req, res, next) => { 
+
+  const currentUser = req.user.id
+    
+  Playlist
+    .findAll({
+      where: {
+        userId: currentUser
+      }
+    })
     .then(playlists => res.json({Playlists: playlists}))
     .catch(error => next(error))
+  }
 )
 
 router.get(
@@ -29,12 +47,13 @@ router.get(
   auth,
   (req, res, next) => {
 
-  const id = req.params.id
+  const playlistId = req.params.id
+  const userId = req.user.id
 
   Playlist
-    .findByPk(id)
+    .findByPk(playlistId, {include: [Song]})
     .then(playlist => {
-      if (playlist) {
+      if (playlist && userId == playlist.userId) {
         res.json({Playlist: playlist})
       } else {
         res.status(404).json({message: 'Playlist not found'})
@@ -49,14 +68,25 @@ router.delete(
   auth,
   (req, res, next) => {
 
-  const id = req.params.id
+  const playlistId = req.params.id
+  const currentUser = req.user.id
 
   Playlist
-    .findByPk(id)
-    .then(playlist => playlist.destroy({playlist}) )
-    .then(playlist => res
-      .status(200)
-      .json({message: 'Playlist had succesfully been deleted'}))
+    .findByPk(playlistId)
+    .then(playlist => {
+      if (!playlist || playlist.userId !== currentUser) {
+        res
+          .status(404)
+          .json({message: "This playlist does not exist"})
+      } else {
+        playlist.destroy()
+        .then(playlist => {
+          res
+            .status(200)
+            .json({message: "Playlist has succesfully been deleted"})
+        })
+      }
+    })
     .catch(error => next(error))
   }
 )
